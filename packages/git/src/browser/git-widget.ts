@@ -1,9 +1,9 @@
 /*
-* Copyright (C) 2017 TypeFox and others.
-*
-* Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-*/
+ * Copyright (C) 2017 TypeFox and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 import { injectable, inject } from 'inversify';
 import { Git } from '../common/git';
@@ -51,15 +51,13 @@ export class GitWidget extends VirtualWidget {
 
         this.addClass('theia-git');
         this.update();
+
+        this.repositoryProvider.onDidChangeRepository(repo => {
+            this.initialize(repo);
+        });
     }
 
-    protected onActivateRequest() {
-        this.initialize();
-    }
-
-    async initialize(): Promise<void> {
-        await this.repositoryProvider.refresh();
-        const repository = this.repositoryProvider.selectedRepository;
+    async initialize(repository: Repository | undefined): Promise<void> {
         if (repository) {
             this.gitWatcher.dispose();
             this.watcherDisposable = await this.gitWatcher.watchGitChanges(repository);
@@ -180,7 +178,6 @@ export class GitWidget extends VirtualWidget {
             title: 'Refresh',
             onclick: async e => {
                 await this.repositoryProvider.refresh();
-                this.initialize();
             }
         }, h.i({ className: 'fa fa-refresh' }));
         const commands = repository ? h.a({
